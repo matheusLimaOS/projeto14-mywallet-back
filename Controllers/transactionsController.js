@@ -5,3 +5,7 @@ export async function getTransactions(req,res){
 
     res.status(200).send(find);
 }
+
+export async function insertTransaction(req,res){
+    res.status(200).send();
+}
