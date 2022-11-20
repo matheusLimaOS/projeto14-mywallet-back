@@ -13,6 +13,7 @@ export async function verifyToken(req,res,next){
     let find = await db.collection("sessions").findOne({token:token});
 
     if(find){
+        res.locals.userID = find.userId;
         next();
     }
     else{
@@ -20,10 +21,10 @@ export async function verifyToken(req,res,next){
     }
 }
 export function verifyTransaction(req,res,next){
-    let {valor,descricao} = req.body;
+    let {valor,descricao,tipo} = req.body;
     let transaction = {
         valor: valor,
-        descricao: stripHtml(descricao === undefined ? "" : descricao).result,
+        descricao: stripHtml(descricao === undefined ? "" : descricao).result.trim(),
     };
 
     let validation = transactionSchema.validate(transaction,{abortEarly:false});
@@ -34,6 +35,16 @@ export function verifyTransaction(req,res,next){
         return;
     }
     else{
-        next();
+        if(tipo === 'E' || tipo === 'S'){
+            res.locals.transaction = {
+                valor: transaction.valor,
+                descricao: transaction.descricao,
+                tipo:tipo
+            }
+            next();
+        }
+        else{
+            res.status(422).send("Tipo incorreto");
+        }
     }
 }

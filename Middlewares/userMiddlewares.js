@@ -12,13 +12,13 @@ const signInSchema = joi.object({
     password: joi.string().required(),
 })
 
-export function verifySignUp(req,res,next){
+export async function verifySignUp(req,res,next){
     let {name,email,password,confirmPassword} = req.body;
     let user = {
-        name: stripHtml(name === undefined ? "" : name).result,
-        email: stripHtml(email === undefined ? "" : email).result,
-        password: stripHtml(password === undefined ? "" : password).result,
-        confirmPassword:stripHtml(confirmPassword  === undefined ? "" : confirmPassword).result
+        name: stripHtml(name === undefined ? "" : name).result.trim(),
+        email: stripHtml(email === undefined ? "" : email).result.trim(),
+        password: stripHtml(password === undefined ? "" : password).result.trim(),
+        confirmPassword:stripHtml(confirmPassword  === undefined ? "" : confirmPassword).result.trim()
     };
 
     let validation = signUpSchema.validate(user,{abortEarly:false});
@@ -33,15 +33,27 @@ export function verifySignUp(req,res,next){
             res.status(422).send("Senha e confirmação de senha divergem!");
         }
         else{
-            next();
+            let find = await db.collection("users").findOne({email:user.email});
+            if(find){
+                res.status(422).send("E-mail já cadastrado");
+            }
+            else{
+                res.locals.user = {
+                    name: user.name,
+                    email: user.email,
+                    password: user.password
+                }
+                next();
+            }
+            
         }
     }
 }
 export async function verifySignIn(req,res,next){
     let {email,password} = req.body;
     let user = {
-        email: stripHtml(email === undefined ? "" : email).result,
-        password: stripHtml(password === undefined ? "" : password).result,
+        email: stripHtml(email === undefined ? "" : email).result.trim(),
+        password: stripHtml(password === undefined ? "" : password).result.trim(),
     };
 
     let validation = signInSchema.validate(user,{abortEarly:false});
@@ -55,6 +67,10 @@ export async function verifySignIn(req,res,next){
         let find = await db.collection("users").find({email:user.email}).toArray();
 
         if(find.length > 0){
+            res.locals.user = {
+                email:email,
+                password:password
+            };
             next();
         }
         else{

@@ -3,7 +3,7 @@ import {db} from '../db.js';
 import { v4 as uuid } from 'uuid';
 
 export async function SignUp(req,res){
-    let {name,email,password} = req.body;
+    let {name,email,password} = res.locals.user;
     
     let insert = await db.collection("users").insertOne({
         name: name,
@@ -20,12 +20,11 @@ export async function SignUp(req,res){
     
 }
 export async function SignIn(req,res){
-    let {email,password} = req.body;
+    let {email,password} = res.locals.user;
     let find = await db.collection("users").findOne({email:email});
 
     if(bcrypt.compareSync(password,find.password)){
         const token = uuid();
-        
         await db.collection("sessions").insertOne({
             userId: find._id,
             token
