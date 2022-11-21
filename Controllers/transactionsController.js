@@ -38,5 +38,16 @@ export async function updateTransaction(req,res){
     else{
         res.status(500).send("erro");
     }
-    console.log(update);
+}
+
+export async function deleteTransaction(req,res){
+    let id = res.locals.id;
+    let update = await db.collection("transactions").deleteOne({_id:ObjectId(id)});
+
+    if(update){
+        res.status(200).send("Deletado com sucesso");
+    }
+    else{
+        res.status(500).send("erro");
+    }
 }

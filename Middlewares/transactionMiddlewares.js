@@ -1,6 +1,7 @@
 import joi from 'joi';
 import {stripHtml} from "string-strip-html";
 import {db} from '../db.js';
+import { ObjectId } from 'mongodb';
 
 const transactionSchema = joi.object({
     valor: joi.number().required(),
@@ -8,7 +9,7 @@ const transactionSchema = joi.object({
 })
 
 export async function verifyToken(req,res,next){
-    let {token} = req.headers
+    let {token} = req.headers;
 
     let find = await db.collection("sessions").findOne({token:token});
 
@@ -47,5 +48,19 @@ export function verifyTransaction(req,res,next){
         else{
             res.status(422).send("Tipo incorreto");
         }
+    }
+}
+export async function verifyDeleteTransaction(req,res,next){
+    let id = req.params.id;
+    let userID = res.locals.userID;
+
+    let find = await db.collection("transactions").findOne({_id:ObjectId(id),userID:userID});
+    
+    if(find){
+        res.locals.id = find._id;
+        next();
+    }
+    else{
+        res.status(422).send("Transaction não encontrada ou não pertence a esse usuário");
     }
 }
