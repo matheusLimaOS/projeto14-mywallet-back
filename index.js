@@ -9,4 +9,4 @@ app.use(express.json())
 app.use(cors())
 app.use(userRouter)
 app.use(transactionRouter)
-app.listen(5000,console.log('On The Line'));
+app.listen(process.env.PORT,console.log('On The Line'));
