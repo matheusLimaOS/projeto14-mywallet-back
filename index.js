@@ -7,7 +7,9 @@ const app = express();
 
 app.use(express.json())
 app.use(cors());
-
+app.get("/status",(req,res)=>{
+    return res.send("OK");
+})
 app.use(userRouter)
 app.use(transactionRouter)
 
