@@ -21,7 +21,7 @@ export async function verifyToken(req,res,next){
     }
 }
 export function verifyTransaction(req,res,next){
-    let {valor,descricao,tipo} = req.body;
+    let {valor,descricao,tipo,_id} = req.body;
     let transaction = {
         valor: valor,
         descricao: stripHtml(descricao === undefined ? "" : descricao).result.trim(),
@@ -39,7 +39,8 @@ export function verifyTransaction(req,res,next){
             res.locals.transaction = {
                 valor: transaction.valor,
                 descricao: transaction.descricao,
-                tipo:tipo
+                tipo:tipo,
+                id:_id
             }
             next();
         }

@@ -29,8 +29,12 @@ export async function SignIn(req,res){
             userId: find._id,
             token
         })
+        let user = {
+            name: find.name,
+            token
+        }
 
-        res.status(200).send(token);
+        res.status(200).send(user);
     }
     else{
         res.status(401).send("Senha incorreta");

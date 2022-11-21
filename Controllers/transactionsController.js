@@ -26,3 +26,17 @@ export async function insertTransaction(req,res){
         res.status(500).send("erro");
     }
 }
+
+export async function updateTransaction(req,res){
+    let {valor,descricao,id} = res.locals.transaction;
+    console.log(id)
+    let update = await db.collection("transactions").updateOne({_id:ObjectId(id)},{$set:{valor,descricao}});
+
+    if(update){
+        res.status(200).send("Atualizado com sucesso");
+    }
+    else{
+        res.status(500).send("erro");
+    }
+    console.log(update);
+}
